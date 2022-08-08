@@ -1,0 +1,61 @@
+package com.geotek.siivra.dto.response;
+
+public interface IndicadorResponseDTO {
+
+    Long getId();
+    Long getIdRutina();
+    String getNombreRutina();
+    Long getIdCompDesagregacion();
+    String getNombreCompDesagregacion();
+    Long getIdAdaptacionNivel();
+    String getNombreAdaptacionNivel();
+    Long getIdDimension();
+    String getNombreDimension();
+    Long getIdClasificacionAdap();
+    String getNombreClasificacionAdap();
+    Long getIdIndicadorSubindice();
+    String getNombreIndicadorSubindice();
+    Long getIdIndicadorIndice();
+    String getNombreIndicadorIndice();
+    Long getIdModeloCompone();
+    String getNombreModeloCompone();
+    Long getIdIndicadorSeccion();
+    String getNombreIndicadorSeccion();
+    Long getIdUnidadMedida();
+    String getNombreUnidadMedida();
+    Long getIdTipoSalidaGeografica();
+    String getNombreTipoSalidaGeografica();
+    Long getIdIndicadorTipo();
+    String getNombreIndicadorTipo();
+    Long getIdAlcanceInformacion();
+    String getNombreAlcanceInformacion();
+    Long getIdPeriodicidad();
+    String getNombrePeriodicidad();
+    Long getIdPlanAdaptacion();
+    String getNombrePlanAdaptacion();
+    Long getIdEstado();
+    String getNombreEstado();
+    String getNombre();
+    String getCodigo();
+    String getFechaPublicacion();
+    String getDescripcion();
+    String getArchivoFicha();
+    String getUrlFicha();
+    String getUrlPublicacion();
+    String getObservaciones();
+    String getFechaPlazoMeta();
+    String getEtiquetasPublicacion();
+    String getCalcularValoresJerarquia();
+    String getNecesitaValidar();
+    String getNecesitaAprobar();
+    Long getIdFormaAlmacenarInfo();
+    String getNombreFormaAlmacenarInfo();
+    Long getIdDisposicionInfo();
+    String getNombreDisposicionInfo();
+    Long getIdFormatoOrigenDatos();
+    String getNombreFormatoOrigenDatos();
+    String getAlmacenarGeografia();
+    Integer getAsociada();
+    String getAuditoria();
+
+}
