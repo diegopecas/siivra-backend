@@ -17,6 +17,7 @@ import com.geotek.siivra.repository.AuditoriaRepository;
 import com.geotek.siivra.repository.ICompDesagreacionItemRepository;
 import com.geotek.siivra.repository.IDataIndicadorRepository;
 import com.geotek.siivra.repository.IIndicadorRepository;
+import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -26,6 +27,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.bind.DatatypeConverter;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Logger;
 // import java.util.stream.Collectors;
@@ -108,14 +111,14 @@ public class DataIndicadorServiceImpl implements IDataIndicadorService {
                                 logger.info("Crear dato nuevo en mantener: " + periodo);
                                 iDataIndicadorRepository.save(dataIndicador);
                                 resumen = resumen.concat(periodo+", creado.");
-                                procedureInvoker.procedureName(auditoria, "","indicador_info_alfa",dataIndicador.getId());
+                                String aud = configurarAuditoria(dataIndicador.getId(), auditoria);
+                                procedureInvoker.procedureName(aud, "","indicador_info_alfa",dataIndicador.getId());
                                 adds.add(dataIndicador);
                             } catch (Exception dex) {
                                 // adds.add(dataIndicador);
                                 resumen = resumen.concat(periodo+", error al crear.");
                             }
                         } else {
-                            // logger.info("NO HAY DATOS:" +data.get(0).getPeriodoInicialValidez());
                             resumen = resumen.concat(periodo+", existe.");
                         }
 
@@ -133,7 +136,6 @@ public class DataIndicadorServiceImpl implements IDataIndicadorService {
                     }
                 }
             } else { // reemplazar
-                logger.info("REEMPLAZAR");
                 if (dataIndicadorRequestDTO.getId() != null) { // dato existente que viene con ID conocido - update
                     DataIndicador dataIndicador = new DataIndicador();
 
@@ -144,7 +146,8 @@ public class DataIndicadorServiceImpl implements IDataIndicadorService {
                     try {
                         iDataIndicadorRepository.save(dataIndicador);
                         resumen = resumen.concat(dataIndicador.getPeriodoInicialValidez()+", reemplazado.");
-                        procedureInvoker.procedureName(auditoria, "","indicador_info_alfa",dataIndicador.getId());
+                        String aud = configurarAuditoria(dataIndicador.getId(), auditoria);
+                        procedureInvoker.procedureName(aud, "","indicador_info_alfa",dataIndicador.getId());
                         adds.add(dataIndicador);
                     } catch (Exception dex) {
                         adds.add(dataIndicador);
@@ -158,27 +161,25 @@ public class DataIndicadorServiceImpl implements IDataIndicadorService {
                         c.setMensaje(Mensajes.DATO_INDICADOR_ADD_NO_DATA);
                     }
                 } else { // dato sin ID conocido - create
-                    logger.info("DATO SIN ID CONOCIDO "+dataIndicadorRequestDTO.getPeriodoInicialValidez()+"/"+dataIndicadorRequestDTO.getPeriodoFinalValidez());
                     if (dataIndicadorRequestDTO.getPeriodoInicialValidez().compareTo(dataIndicadorRequestDTO.getPeriodoFinalValidez())==0) { // mismo periodo
                         DataIndicador dataIndicador = new DataIndicador();
                         BeanUtils.copyProperties(dataIndicadorRequestDTO, dataIndicador);
                         List<DataIndicador> data = iDataIndicadorRepository.findByPeriodo(dataIndicador.getIdIndicador(), dataIndicador.getIdComponenteDesagregaItem(), dataIndicadorRequestDTO.getPeriodoInicialValidez(), dataIndicadorRequestDTO.getPeriodoFinalValidez());
                         if (data.size() > 0 ) {
                             dataIndicador.setId(data.get(0).getId());
-                            logger.info("SE OBTIENE ID "+data.get(0).getId());
                         }
                         if(dataIndicadorRequestDTO.getValorMeta() == -2d) {
                             dataIndicador.setValorMeta(null);
                         }
                         try {
                             iDataIndicadorRepository.save(dataIndicador);
-                            logger.info("GUARDADO "+dataIndicador.getId() + " - AUDITORIA: " + auditoria);
                             if(data.size() > 0 ) {
                                 resumen = resumen.concat(dataIndicador.getPeriodoInicialValidez()+", reemplazado.");
                             } else {
                                 resumen = resumen.concat(dataIndicador.getPeriodoInicialValidez()+", creado.");
                             }
-                            procedureInvoker.procedureName(auditoria, "","indicador_info_alfa",dataIndicador.getId());
+                            String aud = configurarAuditoria(dataIndicador.getId(), auditoria);
+                            procedureInvoker.procedureName(aud, "","indicador_info_alfa",dataIndicador.getId());
                             adds.add(dataIndicador);
                         } catch (Exception dex) {
                             adds.add(dataIndicador);
@@ -214,7 +215,8 @@ public class DataIndicadorServiceImpl implements IDataIndicadorService {
                                 } else {
                                     resumen = resumen.concat(periodo+", creado.");
                                 }
-                                procedureInvoker.procedureName(auditoria, "","indicador_info_alfa",dataIndicador.getId());
+                                String aud = configurarAuditoria(dataIndicador.getId(), auditoria);
+                                procedureInvoker.procedureName(aud, "","indicador_info_alfa",dataIndicador.getId());
                                 adds.add(dataIndicador);
                             } catch (Exception dex) {
                                 adds.add(dataIndicador);
@@ -275,7 +277,8 @@ public class DataIndicadorServiceImpl implements IDataIndicadorService {
             DataIndicador dataIndicador = new DataIndicador();
             BeanUtils.copyProperties(dataIndicadorRequestDTO, dataIndicador);
             iDataIndicadorRepository.save(dataIndicador);
-            procedureInvoker.procedureName(auditoria, "","indicador_info_alfa",dataIndicador.getId());
+            String aud = configurarAuditoria(dataIndicador.getId(), auditoria);
+            procedureInvoker.procedureName(aud, "","indicador_info_alfa",dataIndicador.getId());
             return ResponseEntity.status(HttpStatus.OK).body("Data Indicador actualizado correctamente, id data indicador: " + dataIndicador.getId());
 
         } catch(Exception e) {
@@ -289,7 +292,8 @@ public class DataIndicadorServiceImpl implements IDataIndicadorService {
         CreateResponseDTO createResponseDTO = new CreateResponseDTO();
         try {
             iDataIndicadorRepository.delete(id);
-            procedureInvoker.procedureName(auditoria, motivo,"indicador_info_alfa",id);
+            String aud = configurarAuditoria(id, auditoria);
+            procedureInvoker.procedureName(aud, motivo,"indicador_info_alfa",id);
             createResponseDTO.setEntidad("Data indicador");
             createResponseDTO.setId(id);
             createResponseDTO.setMensaje(Mensajes.DATO_ELIMINADO);
@@ -342,22 +346,6 @@ public class DataIndicadorServiceImpl implements IDataIndicadorService {
         return listaDataIndicador;
     }
 
-    private DataIndicador object2DataIndicador( Object [] objDataIndicador ){
-        DataIndicador dataIndicador = new DataIndicador();
-        dataIndicador.setId((Long) objDataIndicador[0]);
-        dataIndicador.setIdIndicador((Long) objDataIndicador[1]);
-        dataIndicador.setIdProcesoIndicador((Long) objDataIndicador[2]);
-        dataIndicador.setIdComponenteDesagregaItem((Long) objDataIndicador[3]);
-        dataIndicador.setValor((Double) objDataIndicador[4]);
-        dataIndicador.setPeriodoInicialValidez((String) objDataIndicador[5]);
-        dataIndicador.setPeriodoFinalValidez((String) objDataIndicador[6]);
-        dataIndicador.setValorMeta((Double) objDataIndicador[7]);
-        dataIndicador.setIdTipoEstado((Long) objDataIndicador[8]);
-        dataIndicador.setMotivo((String) objDataIndicador[9]);
-        dataIndicador.setMotivoComplementario((String) objDataIndicador[10]);
-        return dataIndicador;
-    }
-
     @Override
     public ResponseEntity<Object> updateDataIndicadorMasivo(List<DataIndicadorRequestDTO> dataIndicadorRequestDTO, String auditoria) {
 
@@ -372,7 +360,8 @@ public class DataIndicadorServiceImpl implements IDataIndicadorService {
                     DataIndicador dato = new DataIndicador();
                     BeanUtils.copyProperties(d, dato);
                     iDataIndicadorRepository.save(dato);
-                    procedureInvoker.procedureName(auditoria, "","indicador_info_alfa",dato.getId());
+                    String aud = configurarAuditoria(dato.getId(), auditoria);
+                    procedureInvoker.procedureName(aud, "","indicador_info_alfa",dato.getId());
                     CreateResponseDTO c = new CreateResponseDTO();
                     c.setEntidad("Data Indicador");
                     c.setId(dato.getId());
@@ -402,7 +391,9 @@ public class DataIndicadorServiceImpl implements IDataIndicadorService {
             iDataIndicadorRepository.deleteDataIndicadorWithIds(ids);
             Iterator it = ids.iterator();
             while (it.hasNext()) {
-                procedureInvoker.procedureName(auditoria,motivo,"indicador_info_alfa", (Long)it.next());
+                Long _id = (Long)it.next();
+                String aud = configurarAuditoria(_id, auditoria);
+                procedureInvoker.procedureName(aud,motivo,"indicador_info_alfa", _id);
             }
             return new ResponseEntity<Object>(ids, HttpStatus.OK);
         } catch(Exception e) {
@@ -472,7 +463,8 @@ public class DataIndicadorServiceImpl implements IDataIndicadorService {
                 ValidarAprobarDataIndicadorRequestDTO d = (ValidarAprobarDataIndicadorRequestDTO)it2.next();
                 try {
                     iDataIndicadorRepository.updateEstadoDataIndicador(d.getId(), estado );//dato.getIdTipoEstado());
-                    procedureInvoker.procedureName(auditoria, "","indicador_info_alfa",d.getId());
+                    String aud = configurarAuditoria(d.getId(), auditoria);
+                    procedureInvoker.procedureName(aud, "","indicador_info_alfa",d.getId());
                     CreateResponseDTO c = new CreateResponseDTO();
                     c.setEntidad("Data Indicador");
                     c.setId(d.getId());
@@ -502,5 +494,38 @@ public class DataIndicadorServiceImpl implements IDataIndicadorService {
         }
     }
 
+    private String configurarAuditoria(Long id, String auditoria) {
+        try {
+            byte[] auditoriaValue = DatatypeConverter.parseBase64Binary(auditoria);
+            String auditoriaDecode = new String(auditoriaValue, StandardCharsets.UTF_8);
+            JSONObject auditoriaJsonObject = new JSONObject(auditoriaDecode);
+            String tipoAccion = auditoriaJsonObject.optString("tipoAccion","N/A");
+            String usuario = auditoriaJsonObject.optString("usuario","N/A");
+            String formaCarga = "";
+            switch (tipoAccion) {
+                case "Carga individual":
+                    formaCarga = tipoAccion + "::" + usuario;
+                    break;
+                case "Carga masiva":
+                    formaCarga = tipoAccion + "::" + usuario;
+                    break;
+                default:
+                    Object lastAuditoria = iDataIndicadorRepository.getLastAuditoria(id);
+                    byte[] lastAuditoriaValue = DatatypeConverter.parseBase64Binary(lastAuditoria.toString());
+                    String lastAuditoriaDecode = new String(lastAuditoriaValue, StandardCharsets.UTF_8);
+                    JSONObject lastAuditoriaJsonObject = new JSONObject(lastAuditoriaDecode);
+                    formaCarga = lastAuditoriaJsonObject.optString("formaCarga","Carga individual::admin");
+                    break;
+            }
 
+            logger.info(formaCarga);
+            auditoriaJsonObject.putOpt("formaCarga", formaCarga);
+
+            String auditoriaEncode = DatatypeConverter.printBase64Binary(auditoriaJsonObject.toString().getBytes(StandardCharsets.UTF_8));
+
+            return auditoriaEncode;
+        } catch (Exception ex) {
+            return auditoria;
+        }
+    }
 }

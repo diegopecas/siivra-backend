@@ -99,4 +99,8 @@ public interface IDataVariableRepository  extends JpaRepository<DataVariable, Lo
 
     @Query("SELECT COUNT(u) FROM DataVariable u WHERE u.idVariable=:idVariable")
     long getCountOfDataByVariable(@Param("idVariable") long idVariable);
+
+    @Query(value = "SELECT auditoria FROM siivra_conf.siivrat_variable_info_alfa_v where id_variable_info_alfa = :idDataVariable ORDER BY id DESC LIMIT 1", nativeQuery = true)
+    Object getLastAuditoria(@Param("idDataVariable") long idDataVariable);
+
 }

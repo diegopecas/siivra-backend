@@ -61,7 +61,6 @@ public class DataVariableController {
 
     @PostMapping("/eliminar/{id}/{auditoria}/{motivo}")
     public ResponseEntity<String> deleteDataVariable(@PathVariable Long id, @PathVariable String auditoria, @PathVariable String motivo) {
-        System.out.println("deleteDataVariable" + " /eliminar/{id}/{auditoria}/{motivo}");
         ResponseEntity responseEntity = iDataVariableService.deleteDataVariable(id, auditoria, motivo);
         return responseEntity;
     }
@@ -81,14 +80,12 @@ public class DataVariableController {
 
     @PostMapping("/actualizarMasivo/{dataVariableDTO}/{auditoria}")
     public ResponseEntity<Object> updateDataVariableMasivo(@RequestBody List<DataVariableRequestDTO> dataVariableRequestDTO, @PathVariable String auditoria) {
-        System.out.println("Actualizar masivo :: " + auditoria);
         ResponseEntity responseEntity = iDataVariableService.updateDataVariableMasivo(dataVariableRequestDTO, auditoria);
         return responseEntity;
     }
 
     @PostMapping("/eliminarMasivo/{auditoria}/{motivo}")
     public ResponseEntity<Object>  deleteDataVariableWithIds(@RequestBody List<DataVariableRequestDTO> dataVariableDTO, @PathVariable String auditoria, @PathVariable String motivo) {
-        // List<Long> ids = dataVariableDTO.stream().map(DataVariableRequestDTO::getId).collect(Collectors.toList());
         List<Long> ids = new ArrayList<>();
         Iterator it = dataVariableDTO.iterator();
         while (it.hasNext()){

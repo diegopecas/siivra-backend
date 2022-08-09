@@ -16,13 +16,16 @@ import com.geotek.siivra.repository.AuditoriaRepository;
 import com.geotek.siivra.repository.ICompDesagreacionItemRepository;
 import com.geotek.siivra.repository.IDataVariableRepository;
 import com.geotek.siivra.repository.IVariableRepository;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
+import javax.xml.bind.DatatypeConverter;
+import java.nio.charset.StandardCharsets;
 import com.geotek.siivra.api.email.rest.EmailService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,7 +125,8 @@ public class IDataVariableServiceImpl implements IDataVariableService {
                                 try {
                                     iDataVariableRepository.save(dataVariable);
                                     resumen = resumen.concat(periodo+", creado.");
-                                    procedureInvoker.procedureName(auditoria,"","variable_info_alfa", dataVariable.getId());
+                                    String aud = configurarAuditoria(dataVariable.getId(), auditoria);
+                                    procedureInvoker.procedureName(aud,"","variable_info_alfa", dataVariable.getId());
                                     adds.add(dataVariable);
                                 } catch (Exception dex) {
                                     logger.info("[DEX MASIVO] " + dex.getMessage());
@@ -155,7 +159,8 @@ public class IDataVariableServiceImpl implements IDataVariableService {
                     try {
                         iDataVariableRepository.save(dataVariable);
                         resumen = resumen.concat(dataVariable.getPeriodoInicialValidez()+", reemplazado.");
-                        procedureInvoker.procedureName(auditoria,"","variable_info_alfa", dataVariable.getId());
+                        String aud = configurarAuditoria(dataVariable.getId(), auditoria);
+                        procedureInvoker.procedureName(aud,"","variable_info_alfa", dataVariable.getId());
                         adds.add(dataVariable);
                     } catch (Exception dex) {
                         adds.add(dataVariable);
@@ -183,7 +188,8 @@ public class IDataVariableServiceImpl implements IDataVariableService {
                             } else {
                                 resumen = resumen.concat(dataVariable.getPeriodoInicialValidez()+", creado.");
                             }
-                            procedureInvoker.procedureName(auditoria,"","variable_info_alfa", dataVariable.getId());
+                            String aud = configurarAuditoria(dataVariable.getId(), auditoria);
+                            procedureInvoker.procedureName(aud,"","variable_info_alfa", dataVariable.getId());
                             adds.add(dataVariable);
                         } catch (Exception dex) {
                             adds.add(dataVariable);
@@ -214,7 +220,8 @@ public class IDataVariableServiceImpl implements IDataVariableService {
                                 } else {
                                     resumen = resumen.concat(periodo+", creado.");
                                 }
-                                procedureInvoker.procedureName(auditoria,"","variable_info_alfa", dataVariable.getId());
+                                String aud = configurarAuditoria(dataVariable.getId(), auditoria);
+                                procedureInvoker.procedureName(aud,"","variable_info_alfa", dataVariable.getId());
                                 adds.add(dataVariable);
                             } catch (Exception dex) {
                                 adds.add(dataVariable);
@@ -264,11 +271,11 @@ public class IDataVariableServiceImpl implements IDataVariableService {
     public ResponseEntity<String> updateDataVariable(DataVariableRequestDTO dataVariableRequestDTO, String auditoria) {
 
         try {
-
+            String aud = configurarAuditoria(dataVariableRequestDTO.getId(), auditoria);
             DataVariable dataVariable = new DataVariable();
             BeanUtils.copyProperties(dataVariableRequestDTO, dataVariable);
             iDataVariableRepository.save(dataVariable);
-            procedureInvoker.procedureName(auditoria,"","variable_info_alfa", dataVariable.getId());
+            procedureInvoker.procedureName(aud,"","variable_info_alfa", dataVariable.getId());
             return ResponseEntity.status(HttpStatus.OK).body("Data Variable actualizada correctamente, id data variable: " + dataVariable.getId());
 
         } catch(Exception e) {
@@ -280,8 +287,9 @@ public class IDataVariableServiceImpl implements IDataVariableService {
     @Override
     public ResponseEntity<String> deleteDataVariable(Long id, String auditoria, String motivo) {
         try {
+            String aud = configurarAuditoria(id, auditoria);
             iDataVariableRepository.delete(id);
-            procedureInvoker.procedureName(auditoria,motivo,"variable_info_alfa", id);
+            procedureInvoker.procedureName(aud,motivo,"variable_info_alfa", id);
             return ResponseEntity.status(HttpStatus.OK).body("Dato de variable eliminado correctamente");
         } catch (Exception ex) {
             return new ResponseEntity<String>(Mensajes.NO_DELETE_DATO, HttpStatus.NOT_ACCEPTABLE);
@@ -392,7 +400,8 @@ public class IDataVariableServiceImpl implements IDataVariableService {
                     DataVariable dato = new DataVariable();
                     BeanUtils.copyProperties(d, dato);
                     iDataVariableRepository.save(dato);
-                    procedureInvoker.procedureName(auditoria,"","variable_info_alfa", dato.getId());
+                    String aud = configurarAuditoria(dato.getId(), auditoria);
+                    procedureInvoker.procedureName(aud,"","variable_info_alfa", dato.getId());
                     CreateResponseDTO c = new CreateResponseDTO();
                     c.setEntidad("Data Variable");
                     c.setId(dato.getId());
@@ -423,7 +432,9 @@ public class IDataVariableServiceImpl implements IDataVariableService {
             iDataVariableRepository.deleteDataVariableWithIds(ids);
             Iterator it = ids.iterator();
             while (it.hasNext()) {
-                procedureInvoker.procedureName(auditoria,motivo,"variable_info_alfa", (Long)it.next());
+                Long _id = (Long)it.next();
+                String aud = configurarAuditoria(_id, auditoria);
+                procedureInvoker.procedureName(aud,motivo,"variable_info_alfa", _id);
             }
             return new ResponseEntity<Object>(ids, HttpStatus.OK);
         } catch(Exception e) {
@@ -467,7 +478,8 @@ public class IDataVariableServiceImpl implements IDataVariableService {
                 ValidarAprobarDataVariableRequestDTO d = (ValidarAprobarDataVariableRequestDTO)it2.next();
                 try {
                     iDataVariableRepository.updateEstadoDataVariable(d.getId(), estado );//dato.getIdTipoEstado());
-                    procedureInvoker.procedureName(auditoria,"","variable_info_alfa", d.getId());
+                    String aud = configurarAuditoria(d.getId(), auditoria);
+                    procedureInvoker.procedureName(aud,"","variable_info_alfa", d.getId());
                     CreateResponseDTO c = new CreateResponseDTO();
                     c.setEntidad("Data Variable");
                     c.setId(d.getId());
@@ -496,4 +508,38 @@ public class IDataVariableServiceImpl implements IDataVariableService {
         }
     }
 
+    private String configurarAuditoria(Long id, String auditoria) {
+        try {
+            byte[] auditoriaValue = DatatypeConverter.parseBase64Binary(auditoria);
+            String auditoriaDecode = new String(auditoriaValue, StandardCharsets.UTF_8);
+            JSONObject auditoriaJsonObject = new JSONObject(auditoriaDecode);
+            String tipoAccion = auditoriaJsonObject.optString("tipoAccion","N/A");
+            String usuario = auditoriaJsonObject.optString("usuario","N/A");
+            String formaCarga = "";
+            switch (tipoAccion) {
+                case "Carga individual":
+                    formaCarga = tipoAccion + "::" + usuario;
+                    break;
+                case "Carga masiva":
+                    formaCarga = tipoAccion + "::" + usuario;
+                    break;
+                default:
+                    Object lastAuditoria = iDataVariableRepository.getLastAuditoria(id);
+                    byte[] lastAuditoriaValue = DatatypeConverter.parseBase64Binary(lastAuditoria.toString());
+                    String lastAuditoriaDecode = new String(lastAuditoriaValue, StandardCharsets.UTF_8);
+                    JSONObject lastAuditoriaJsonObject = new JSONObject(lastAuditoriaDecode);
+                    formaCarga = lastAuditoriaJsonObject.optString("formaCarga","Carga individual::admin");
+                    break;
+            }
+
+            logger.info(formaCarga);
+            auditoriaJsonObject.putOpt("formaCarga", formaCarga);
+
+            String auditoriaEncode = DatatypeConverter.printBase64Binary(auditoriaJsonObject.toString().getBytes(StandardCharsets.UTF_8));
+
+            return auditoriaEncode;
+        } catch (Exception ex) {
+            return auditoria;
+        }
+    }
 }
