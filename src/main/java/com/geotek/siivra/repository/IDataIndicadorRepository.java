@@ -104,7 +104,7 @@ public interface IDataIndicadorRepository extends JpaRepository<DataIndicador, L
     @Query("SELECT COUNT(u) FROM DataIndicador u WHERE u.idIndicador=:idIndicador")
     long getCountOfDataByIndicador(@Param("idIndicador") long idIndicador);
 
-    @Query(value = "SELECT auditoria FROM siivra_conf.siivrat_indicador_info_alfa_v where id_indicador_info_alfa = :idDataIndicador ORDER BY id DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT auditoria FROM siivra_conf.siivrat_indicador_info_alfa_v where id_indicador_info_alfa = :idDataIndicador and auditoria is not null ORDER BY id DESC LIMIT 1", nativeQuery = true)
     Object getLastAuditoria(@Param("idDataIndicador") long idDataIndicador);
 }
 

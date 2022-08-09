@@ -6,10 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="ba0c2eec-3b70-4824-8bda-7b7ba2618b24" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/geotek/siivra/controller/DataVariableController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/geotek/siivra/controller/DataVariableController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/geotek/siivra/repository/IDataIndicadorRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/geotek/siivra/repository/IDataIndicadorRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/geotek/siivra/repository/IDataVariableRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/geotek/siivra/repository/IDataVariableRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/geotek/siivra/service/DataIndicadorServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/geotek/siivra/service/DataIndicadorServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/geotek/siivra/service/IDataVariableServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/geotek/siivra/service/IDataVariableServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
@@ -65,5 +63,6 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
 </project>

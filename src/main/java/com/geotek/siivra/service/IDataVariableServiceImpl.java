@@ -129,7 +129,6 @@ public class IDataVariableServiceImpl implements IDataVariableService {
                                     procedureInvoker.procedureName(aud,"","variable_info_alfa", dataVariable.getId());
                                     adds.add(dataVariable);
                                 } catch (Exception dex) {
-                                    logger.info("[DEX MASIVO] " + dex.getMessage());
                                     resumen = resumen.concat(periodo+", error.");
                                     // adds.add(dataVariable);
                                 }
@@ -246,7 +245,6 @@ public class IDataVariableServiceImpl implements IDataVariableService {
             c.setObjeto(adds);
             return c;
         } catch(Exception e) {
-            logger.info("[DATA VARIABLE] " + e.getMessage());
             c.setMensaje(Mensajes.ERROR_GENERAL_SERVICIO);
             return c;
         }
@@ -258,7 +256,6 @@ public class IDataVariableServiceImpl implements IDataVariableService {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body((Object)datosVariableMR(dataVariableRequestDTO, auditoria, mantener));
         } catch (Exception e) {
-            logger.info("[DATA VARIABLE] " + e.getLocalizedMessage());
             CreateResponseDTO c = new CreateResponseDTO();
             c.setEntidad("Data Variable");
             c.setMensaje(Mensajes.ERROR_GENERAL_SERVICIO);
@@ -373,12 +370,10 @@ public class IDataVariableServiceImpl implements IDataVariableService {
             Iterator it = dataVariableRequestDTO.iterator();
             while (it.hasNext()){
                 DataVariableRequestDTO d = (DataVariableRequestDTO)it.next();
-                logger.severe("insertar..." + d.getValor());
                 resultado.add(datosVariableMR(d, auditoria, mantener));
             }
             return new ResponseEntity<Object>(resultado, HttpStatus.CREATED);
         } catch (Exception e) {
-            logger.severe("[ERR MASIVO] " + e.getStackTrace().toString());
             CreateResponseDTO c = new CreateResponseDTO();
             c.setEntidad("Data Variable");
             c.setMensaje(Mensajes.ERROR_GENERAL_SERVICIO);
@@ -457,14 +452,12 @@ public class IDataVariableServiceImpl implements IDataVariableService {
         List<CreateResponseDTO> resultado = new ArrayList<CreateResponseDTO>();
 
         if (!evaluarUnicoEstado(estados)) {
-            logger.info("[VAL] "+Mensajes.ERROR_UNICO_TIPO_CAMBIO_ESTADO);
             CreateResponseDTO c = new CreateResponseDTO();
             c.setEntidad("Data Variable");
             c.setMensaje(Mensajes.ERROR_UNICO_TIPO_CAMBIO_ESTADO);
             resultado.add(c);
             return new ResponseEntity<Object>(resultado, HttpStatus.NOT_ACCEPTABLE);
         } else if (!evaluarEstado(validarAprobarDataVariableRequestDTO.get(0).getIdTipoEstado(), estado)) {
-            logger.info("[VAL] "+Mensajes.ERROR_NUEVO_CAMBIO_ESTADO);
             CreateResponseDTO c = new CreateResponseDTO();
             c.setEntidad("Data Variable");
             c.setMensaje(Mensajes.ERROR_NUEVO_CAMBIO_ESTADO);
@@ -499,7 +492,6 @@ public class IDataVariableServiceImpl implements IDataVariableService {
 
             return new ResponseEntity<Object>(resultado, HttpStatus.OK);
         } catch(Exception e) {
-            logger.info("[EX] " + e.getMessage());
             CreateResponseDTO c = new CreateResponseDTO();
             c.setEntidad("Data Variable");
             c.setMensaje(Mensajes.ERROR_GLOBAL_CAMBIO_ESTADO);
@@ -528,15 +520,12 @@ public class IDataVariableServiceImpl implements IDataVariableService {
                     byte[] lastAuditoriaValue = DatatypeConverter.parseBase64Binary(lastAuditoria.toString());
                     String lastAuditoriaDecode = new String(lastAuditoriaValue, StandardCharsets.UTF_8);
                     JSONObject lastAuditoriaJsonObject = new JSONObject(lastAuditoriaDecode);
-                    formaCarga = lastAuditoriaJsonObject.optString("formaCarga","Carga individual::admin");
+                    formaCarga = lastAuditoriaJsonObject.optString("formaCarga","desconocido::desconocido");
                     break;
             }
 
-            logger.info(formaCarga);
             auditoriaJsonObject.putOpt("formaCarga", formaCarga);
-
             String auditoriaEncode = DatatypeConverter.printBase64Binary(auditoriaJsonObject.toString().getBytes(StandardCharsets.UTF_8));
-
             return auditoriaEncode;
         } catch (Exception ex) {
             return auditoria;
